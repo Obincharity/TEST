@@ -1,0 +1,263 @@
+EditUser.js
+import React, { useState, useEffect} from "react";
+import {useParams} from 'react-router-dom'
+import './Inscription.css';
+import Axios from 'axios';
+
+function EditUser () {
+
+    const {id} = useParams();
+    
+   const [Nom, setNom] = useState("");
+   const [Email, setEmail] = useState("");
+   const [Profession, setProfession] = useState("");
+   const [Date_naiss, setDate_naiss] = useState(0);
+   const [Tel, setTel] = useState(0);
+   const [Date_adhession, setDate_adhession] = useState(0);
+   const [formData, setformData] = useState("")
+
+
+   const[user, setUser] = useState(
+       {
+           Nom: "",
+           Email:"",
+           Profession: "",
+           Date_naiss: "",
+           Tel: "",
+           Date_adhession: "",
+           formData: "",
+       });
+
+   const EditUser = () =>{
+
+      Axios.post('http://localhost:3005/create',{
+        Nom: Nom,
+        Email: Email,
+        Profession: Profession,
+        Date_naiss: Date_naiss,
+        Tel: Tel,
+        Date_adhession: Date_adhession,
+        formData:formData,
+
+      }).then(()=>{
+        console.log("success");
+      })
+    }
+
+    const loadUser = () =>{
+        Axios.put(`http://localhost:3005/update/${id}`)
+        .then((response) => {
+        setUser(response.data)
+          })
+    }
+    useEffect(() => {
+        loadUser();
+      }, []);
+
+    return(
+       
+        <div className= "Inscription">
+           
+        <div className="forme-box">
+          <div class="title">Editer les informations de l'utilisateur</div>
+            <form>
+                <div className="userdetails">
+                <div>
+                  <label for="nom">Nom Utilisateur</label>
+                  <input type= "text" class="input-box" name="nom" placeholder="Entrer votre nom" required onChange={(event)=>{setNom(event.target.value);}}/>
+                </div>
+                
+                <div>
+                  <label for="email">Email</label>
+                  <input type= "email" class="input-box" name="email" placeholder="Entrer votre email" required onChange={(event)=>{setEmail(event.target.value);}}/>
+                </div>
+               <div>
+                  <label for="address">Profession</label>
+                  <input type= "text" class="input-box" name="address" placeholder="Entrer votre profession" required onChange={(event)=>{setProfession(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="date_naiss">Date_naissance</label>
+                  <input type= "date" class="input-box" name="date_naiss" placeholder="Entrer votre profession" required  onChange={(event)=>{setDate_naiss(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="telephone">Telephone</label>
+                  <input type= "number" class="input-box" name="telephone" placeholder="Numero de telephone" required onChange={(event)=>{setTel(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="date_adhession">Date_adhession</label>
+                  <input type= "date" class="input-box" name="date_adhession" onChange={(event)=>{setDate_adhession (event.target.value);}} />
+               </div>
+               </div>
+            </form>
+           
+            <div className="gender">
+                  <label for="">male</label>
+                   <input type="radio" name="gender" value="male" onChange={(event)=>{setformData(event.target.value);}} />   
+                  <label for="">female</label>
+                   <input  type="radio" name="gender" value="female" onChange={(event)=>{setformData (event.target.value);}} />   
+                
+               </div>
+            <div class="button" onClick = {EditUser}>
+                    <input type="submit" value="Enrégistré"/>
+                </div>
+            </div>
+              
+        </div>
+    )
+}
+export default EditUser;
+
+index.js
+const express = require("express");
+const app = express();
+const mysql = require('mysql2');
+const cors = require('cors');
+
+app.use(cors());
+app.use(express.json());
+
+const db = mysql.createConnection({
+  user: 'root',
+  host: 'localhost',
+  password: 'obincharity',
+  database: 'adherents_system',
+  port: '3306',
+
+});
+
+app.post('/create', (req, res) => {
+    
+  const Nom = req.body.Nom
+  const Email = req.body.Email
+  const Profession = req.body.Profession
+  const Date_naiss = req.body.Date_naiss
+  const Tel = req.body.Tel
+  const Date_adhession = req.body.Date_adhession
+  const formData = req.body.formData
+
+  db.query('INSERT INTO new_table(Nom,Email,Profession,Date_naiss,Telephone,Date_adhession,Sex) VALUES(?,?,?,?,?,?,?) ',
+  [Nom, Email, Profession, Date_naiss, Tel, Date_adhession, formData], (err, result) => {
+      if (err){
+          console.log(err)
+      }else{
+          res.send("Values Inserted")
+      }
+  });
+})
+
+app.get('/adherents', (req,res) => {
+  db.query("SELECT * FROM new_table", (err, result) => {
+    if (err){
+      console.log(err);
+    }else{
+      res.send(result);
+    }
+  });
+});
+app.put('/update',(req,res)=>{
+  const id = req.body.id
+  const Nom = req.body.Nom
+  const Email = req.body.Email
+  const Profession = req.body.Profession
+  const Date_naiss = req.body.Date_naiss
+  const Tel = req.body.Tel
+  const Date_adhession = req.body.Date_adhession
+  const formData = req.body.formData 
+  db.query("UPDATE SET new_table Nom=?,Email=?,Profession=?,Date_naiss=?,Telephone=?,Date_adhession=?,Sex=?  WHERE id=?",
+  [Nom, Email, Profession, Date_naiss, Tel, Date_adhession, formData], (err, result) => {
+    if (err){
+      console.log(err);
+    }else{
+      res.send(result);
+    }
+  })
+} )
+    
+app.listen(3005, () =>{
+  console.log("server working");
+  });
+ 
+ AddUser.js
+ import React, { useState} from "react";
+import './Inscription.css';
+import Axios from 'axios';
+
+function Inscription (){
+   
+   const [Nom, setNom] = useState("");
+   const [Email, setEmail] = useState("");
+   const [Profession, setProfession] = useState("");
+   const [Date_naiss, setDate_naiss] = useState(0);
+   const [Tel, setTel] = useState(0);
+   const [Date_adhession, setDate_adhession] = useState(0);
+   const [formData, setformData] = useState("")
+
+   const addAdherent = () =>{
+
+      Axios.post('http://localhost:3005/create',{
+        Nom: Nom,
+        Email: Email,
+        Profession: Profession,
+        Date_naiss: Date_naiss,
+        Tel: Tel,
+        Date_adhession: Date_adhession,
+        formData:formData,
+
+      }).then(()=>{
+        console.log("success");
+      })
+    }
+    return(
+        
+        <div className= "Inscription">
+           
+        <div className="forme-box">
+          <div class="title">Fiche d'inscription</div>
+            <form>
+                <div className="userdetails">
+                <div>
+                  <label for="nom">Nom Utilisateur</label>
+                  <input type= "text" class="input-box" name="nom" placeholder="Entrer votre nom" required onChange={(event)=>{setNom(event.target.value);}}/>
+                </div>
+                
+                <div>
+                  <label for="email">Email</label>
+                  <input type= "email" class="input-box" name="email" placeholder="Entrer votre email" required onChange={(event)=>{setEmail(event.target.value);}}/>
+                </div>
+               <div>
+                  <label for="address">Profession</label>
+                  <input type= "text" class="input-box" name="address" placeholder="Entrer votre profession" required onChange={(event)=>{setProfession(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="date_naiss">Date_naissance</label>
+                  <input type= "date" class="input-box" name="date_naiss" placeholder="Entrer votre profession" required  onChange={(event)=>{setDate_naiss(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="telephone">Telephone</label>
+                  <input type= "number" class="input-box" name="telephone" placeholder="Numero de telephone" required onChange={(event)=>{setTel(event.target.value);}}/>
+               </div>
+               <div>
+                  <label for="date_adhession">Date_adhession</label>
+                  <input type= "date" class="input-box" name="date_adhession" onChange={(event)=>{setDate_adhession (event.target.value);}} />
+               </div>
+               </div>
+            </form>
+           
+            <div className="gender">
+                  <label for="">male</label>
+                   <input type="radio" name="gender" value="male" onChange={(event)=>{setformData(event.target.value);}} />   
+                  <label for="">female</label>
+                   <input  type="radio" name="gender" value="female" onChange={(event)=>{setformData (event.target.value);}} />   
+                
+               </div>
+            <div class="button" onClick = {addAdherent}>
+                    <input type="submit" value="Enrégistré"/>
+                </div>
+            </div>
+              
+        </div>
+        
+    )
+    
+}
+export default Inscription;
