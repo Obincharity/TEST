@@ -1,0 +1,78 @@
+So i want to send information from one page to another i did this but am receiving no ifo
+Here is my code
+
+SetInfo.js
+import React, {useState} from 'react';
+import { Button, Popup } from 'semantic-ui-react'
+import './SetInfo.css'
+
+function SetInfo(props){
+    console.log(props.location.user)
+   
+    const [State, setState] = useState("");
+
+    const handleChange = (event) => {
+        setState(event.target.value);
+    }
+
+    return(
+        <div>
+
+            <div className="dots"> 
+              <span class="dot" id="dot1"></span>
+              <span class="dot" id="dot2"></span>
+              <span class="dot" id="dot3"></span>
+            </div>
+            <div className="title">
+                <h1>{props.location.user}</h1>
+            </div>
+            <hr></hr>
+            <h2>Modifier les informations de l'utilisateur</h2>
+            <form class="ui form">
+            <textarea placeholder="Tell us more" rows="2" onChange={handleChange}>
+            </textarea></form>
+            <div>
+            <Popup
+               content='Message envoyer'
+                on='click'
+                pinned
+               trigger={
+                 <Button content='Button'onClick={handleChange} />
+            }
+            /> 
+            </div>
+        </div>
+    )
+        
+}
+export default SetInfo;
+
+
+UserInfo.js
+import React from 'react';
+import './UserInfo.js'
+
+function UserInfo({State}, {width='600px', height='500px',margin='70px 40px 40px 300px' , padding="0px 30px 0px 30px" }){
+    return(
+      <div className="box">
+          <h1>Page de Profil</h1>
+        <div class="ui card" style={{ width ,height, margin,padding}}>
+          
+          <div class="ui justified container" style={{margin}}>
+            <b>justified</b>
+           <div class="ui header"></div>
+           <div class="ui divider"></div>
+           </div>
+           <div class="ui info message">
+               <div class="header">{State}</div>
+               <p></p>
+           </div>
+           <div class="ui success message">
+               <div class="header">Comptable</div>
+               <p></p>
+           </div>
+        </div>
+      </div>
+    )
+}
+export default UserInfo;
