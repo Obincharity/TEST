@@ -1,0 +1,96 @@
+Hi am trying to make a filter search bar for my table but it shows this error:
+Error: Objects are not valid as a React child 
+(found: object with keys {id, Nom, Email, Profession, Date_naiss, Telephone, Date_adhession}). 
+If you meant to render a collection of children, use an array instead.
+
+Here is my code 
+import React, { useState, useEffect, useRef } from "react";
+import Axios from 'axios';
+import './Parent.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from "react-router-dom";
+
+function Parent(){
+    const [Info,getInfo] = useState([])
+    const [search, setSearch] = useState("")
+    const [searchResults, setSearchResults] = useState([])
+
+    const inputEl = useRef("")
+    useEffect(() => {
+        getAllInfo();
+      }, []);
+  
+  
+      const getAllInfo = (props) =>{
+         Axios.get('http://localhost:3005/adherents')
+         .then((response) => {
+        
+           getInfo(response.data)
+         })
+         .catch(error => console.log("error"))
+      }
+      const searchHandler = (search) =>{
+         setSearch(search);
+         if (search !== "") {
+             const newList = Info.filter((user,index) => {
+               return Object.values(user).join("").toLowerCase().includes(search.toLowerCase()); 
+             });
+             setSearchResults(newList);
+         }else{
+             setSearchResults(Info)
+             
+         }
+      }
+      const getSearch = () =>{
+          searchHandler(inputEl.current.value)
+      }
+    return(
+        <div className="Info">
+            <div className="PY">
+             <h1>Rechercher les Adherents</h1>
+             <div className="ui search">
+                <div className="ui icon input">
+                  <input ref={inputEl} text="text" 
+                  placeholder="search" className="prompt" 
+                  value={search} onChange={getSearch}></input>
+                  <i className="search icon"></i>
+                </div>
+             </div>
+    <table class="table">
+    <thead class="thead-dark">
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nom</th>
+        <th scope="col">Email</th>
+        <th scope="col">Numero_Tel</th>
+        <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {search.length < 1 ? Info:searchResults }
+              
+          { 
+             Info.map((user,index)=>(
+          
+               <tr>
+                   <th scope="row"> {index+1} </th>
+                   <td> {user.Nom} </td>
+                   <td> {user.Email} </td>
+                   <td> {user.Telephone} </td>
+                   <td>
+                       <Link class="btn btn-primary btn-space" to={{pathname:"./SetInfo", user: user.Nom}} >View</Link>
+                       <Link class="btn btn-outline-primary btn-space" to={{pathname:"./EditUser", user: user}} >Edit</Link>
+                       <Link class="btn btn-danger btn-space">Delete</Link>
+                   </td>
+               
+               </tr>
+             )) 
+          }
+        </tbody>
+
+</table>
+            </div>
+        </div>
+    )
+}
+export default Parent;
